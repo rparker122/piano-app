@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
@@ -30,12 +29,10 @@ export default function PianoKey({
   onMouseUp,
   onMouseLeave,
 }: PianoKeyProps) {
-  // Determine if this is a white or black key
   const isWhiteKey = !isSharp
 
-  // Handle touch events properly
   const handleTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault() // Prevent scrolling while playing
+    e.preventDefault()
     onMouseDown()
   }
 
@@ -44,12 +41,31 @@ export default function PianoKey({
     onMouseUp()
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key.toLowerCase() === keyboardKey.toLowerCase()) {
+      onMouseDown()
+    }
+  }
+
+  const handleKeyUp = (e: React.KeyboardEvent) => {
+    if (e.key.toLowerCase() === keyboardKey.toLowerCase()) {
+      onMouseUp()
+    }
+  }
+
   return (
     <motion.div
       id={id}
+      role="button"
+      tabIndex={0}
+      aria-label={`Piano key ${note}`}
+      onKeyDown={handleKeyDown}
+      onKeyUp={handleKeyUp}
       className={cn(
         "relative select-none cursor-pointer",
-        isWhiteKey ? "w-12 md:w-16 h-40 md:h-48" : "w-8 md:w-10 h-24 md:h-28 absolute z-10 -mx-4 md:-mx-5",
+        isWhiteKey
+          ? "w-12 md:w-16 h-40 md:h-48"
+          : "w-8 md:w-10 h-24 md:h-28 absolute z-10 -mx-4 md:-mx-5"
       )}
       whileTap={{ scale: 0.98 }}
       onMouseDown={onMouseDown}
@@ -57,6 +73,7 @@ export default function PianoKey({
       onMouseLeave={onMouseLeave}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
+      style={{ touchAction: "none" }}
     >
       <motion.div
         className={cn(
@@ -65,27 +82,26 @@ export default function PianoKey({
             ? isActive
               ? color
               : isHighlighted
-                ? "bg-white bg-opacity-90 border-2 border-yellow-300"
-                : "bg-white"
+              ? "bg-white bg-opacity-90 border-2 border-yellow-300"
+              : "bg-white"
             : isActive
-              ? color
-              : isHighlighted
-                ? "bg-gray-800 border-2 border-yellow-300"
-                : "bg-gray-800",
+            ? color
+            : isHighlighted
+            ? "bg-gray-800 border-2 border-yellow-300"
+            : "bg-gray-800"
         )}
         animate={{
           y: isActive ? 2 : 0,
           boxShadow: isActive
             ? `0 0 20px ${isHighlighted ? "rgba(255, 255, 0, 0.7)" : "rgba(255, 255, 255, 0.5)"}`
             : isHighlighted
-              ? "0 0 15px rgba(255, 255, 0, 0.5)"
-              : isWhiteKey
-                ? "0 4px 6px rgba(0, 0, 0, 0.1)"
-                : "0 2px 4px rgba(0, 0, 0, 0.2)",
+            ? "0 0 15px rgba(255, 255, 0, 0.5)"
+            : isWhiteKey
+            ? "0 4px 6px rgba(0, 0, 0, 0.1)"
+            : "0 2px 4px rgba(0, 0, 0, 0.2)"
         }}
         transition={{ type: "spring", stiffness: 400, damping: 10 }}
       >
-        {/* Glow effect when active or highlighted */}
         {(isActive || isHighlighted) && (
           <motion.div
             className="absolute inset-0 rounded-b-md opacity-50"
@@ -94,8 +110,8 @@ export default function PianoKey({
             exit={{ opacity: 0 }}
             style={{
               background: isHighlighted
-                ? `radial-gradient(circle at center, yellow, transparent)`
-                : `radial-gradient(circle at center, ${isWhiteKey ? "white" : "rgba(255,255,255,0.3)"}, transparent)`,
+                ? "radial-gradient(circle at center, yellow, transparent)"
+                : `radial-gradient(circle at center, ${isWhiteKey ? "white" : "rgba(255,255,255,0.3)"}, transparent)`
             }}
           />
         )}
@@ -103,7 +119,7 @@ export default function PianoKey({
         <span
           className={cn(
             "text-xs font-medium",
-            isWhiteKey ? (isActive ? "text-white" : "text-gray-500") : "text-gray-300",
+            isWhiteKey ? (isActive ? "text-white" : "text-gray-500") : "text-gray-300"
           )}
         >
           {note}
@@ -112,7 +128,7 @@ export default function PianoKey({
         <span
           className={cn(
             "text-[10px] mt-1 opacity-70",
-            isWhiteKey ? (isActive ? "text-white" : "text-gray-400") : "text-gray-400",
+            isWhiteKey ? (isActive ? "text-white" : "text-gray-400") : "text-gray-400"
           )}
         >
           {keyboardKey}
@@ -121,4 +137,3 @@ export default function PianoKey({
     </motion.div>
   )
 }
-
